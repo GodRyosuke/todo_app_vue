@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - ../db:/var/lib/mysql
+    restart: always
+    ports: 
+     - 3306:3306
+    environment:
+      - "MYSQL_ROOT_PASSWORD=password"
+      - "MYSQL_DATABASE=wordpress"
+      - "MYSQL_USER=wordpress"
+      - "MYSQL_PASSWORD=wordpress"
+
+  app:
+    depends_on:
+      - db
+    image: node:25.4.0-bullseye-slim
+    ports:
+      - "8000:5173"
+    working_dir: /app
+    command: yarn dev
+    volumes:
+     - ..:/app
+    environment:
+     - HOST=0.0.0.0
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db #mysqlサービス名を指定
+      - PMA_USER=wordpress
+      - PMA_PASSWORD=wordpress
+    links:
+      - db
+    ports:
+      - 4040:80
+    volumes:
+      - ../phpmyadmin/sessions:/sessions
+volumes:
+    db_data:
