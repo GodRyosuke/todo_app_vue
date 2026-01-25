@@ -23,7 +23,16 @@ services:
     working_dir: /app
     command: yarn dev
     volumes:
-     - ..:/app
+     - ../package.json:/app/package.json
+     - ../yarn.lock:/app/yarn.lock
+     - ../node_modules_docker:/app/node_modules
+     - ../src:/app/src
+     - ../index.html:/app/index.html
+     - ../tsconfig.json:/app/tsconfig.json
+     - ../tsconfig.app.json:/app/tsconfig.app.json
+     - ../tsconfig.node.json:/app/tsconfig.node.json
+     - ../vite.config.ts:/app/vite.config.ts
+     - ../public:/app/public
     environment:
      - HOST=0.0.0.0
 

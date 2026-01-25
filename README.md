@@ -1,5 +1,35 @@
 # vuejs_db
 
+## install
+```bash
+yarn install
+./scripts/yarn_install_docker.bat
+yarn build
+docker compose -f ./.dockerfiles/docker-compose.yml build
+```
+
+## run
+### serve dev only app
+```bash
+yarn dev
+```
+
+### serve dev with db
+```bash
+./scripts/serve_dev.bat
+```
+
+### serve runtime
+```bash
+./scripts/serve.bat
+```
+
+### stop service
+```bash
+cd .dockerfiles
+docker compose down
+```
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
