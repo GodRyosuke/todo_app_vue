@@ -1,0 +1,75 @@
+$font-size-base: 1rem; // Assumes the browser default, typically `16px`
+$font-size-sm: $font-size-base * .875;
+$font-size-lg: $font-size-base * 1.25;
+
+$h1-font-size: $font-size-base * 2.5;
+$h2-font-size: $font-size-base * 2;
+$h3-font-size: $font-size-base * 1.75;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+a {
+    text-decoration: none;
+    color: inherit;
+    opacity: 1.0;
+    transition: opacity 0.5s ease;
+}
+
+a:hover {
+    text-decoration: none !important;
+    opacity: 0.5;
+}
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.text-decoration-line-through {
+    text-decoration: line-through !important;
+}
+
+.task-table {
+    min-width: 600px;
+}
+
+.overlay-bg {
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: -1;
+    background-color: rgba(33, 33, 33, 0.648);
+    transition: all 0.5s ease;
+
+    .overlay-input {
+        height: 300px;
+        width: calc(300px + 2rem);
+        top: -100%;
+        left: calc((100% - 300px - 2rem) / 2);
+        transition: top 0.5s ease;
+
+        input {
+            width: 300px;
+        }
+    }
+
+    @media screen and (max-width: 426px) {
+        .overlay-input {
+            width: calc(100% - 2rem);
+            left: 1rem;
+
+            input {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.overlay-bg.show {
+    opacity: 1.0;
+    z-index: 100;
+
+    .overlay-input {
+        top: 3rem;
+    }
+}
