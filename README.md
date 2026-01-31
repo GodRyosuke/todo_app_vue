@@ -2,9 +2,11 @@
 
 ## install
 ```bash
+cd frontend
 yarn install
-./scripts/yarn_install_docker.bat
 yarn build
+cd ..
+./scripts/yarn_install_docker.bat
 docker compose -f ./.dockerfiles/docker-compose.yml build
 ```
 
