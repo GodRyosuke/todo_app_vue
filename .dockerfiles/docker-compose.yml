@@ -2,48 +2,89 @@ version: '3'
 
 services:
   db:
-    image: mysql:5.7
+    image: postgres:17
     volumes:
-      - ../db:/var/lib/mysql
+      - ../db:/var/lib/postgresql/data
     restart: always
     ports: 
-     - 3306:3306
+     - 5432:5432
     environment:
-      - "MYSQL_ROOT_PASSWORD=password"
-      - "MYSQL_DATABASE=wordpress"
-      - "MYSQL_USER=wordpress"
-      - "MYSQL_PASSWORD=wordpress"
+      - TZ=Asia/Tokyo
+      - PGTZ=Asia/Tokyo
+      - POSTGRES_USER=wander
+      - POSTGRES_PASSWORD=wander
+      - POSTGRES_DB=kusu_db
 
   app:
     depends_on:
       - db
-    build:
-      context: ..
-      dockerfile: .dockerfiles/Dockerfile.app
+      - backend
+    image: node:25.4.0-bullseye-slim
     ports:
-      - "8000:80"
+      - "8000:5173"
+    working_dir: /app
+    command: yarn dev
+    volumes:
+     - ../frontend/package.json:/app/package.json
+     - ../frontend/yarn.lock:/app/yarn.lock
+     - ../frontend/node_modules_docker:/app/node_modules
+     - ../frontend/src:/app/src
+     - ../frontend/index.html:/app/index.html
+     - ../frontend/tsconfig.json:/app/tsconfig.json
+     - ../frontend/tsconfig.app.json:/app/tsconfig.app.json
+     - ../frontend/tsconfig.node.json:/app/tsconfig.node.json
+     - ../frontend/vite.config.ts:/app/vite.config.ts
+     - ../frontend/public:/app/public
+    environment:
+     - HOST=0.0.0.0
 
   backend:
     image: node:25.4.0-bullseye-slim
-    working_dir: /usr/src/app
+    depends_on:
+      - db
+    working_dir: /app
     volumes:
-      - ../backend:/usr/src/app
-    command: sh -c "npm install && npm start"
+      - ../backend/package.json:/app/package.json
+      - ../backend/yarn.lock:/app/yarn.lock
+      - ../backend/tsconfig.json:/app/tsconfig.json
+      - ../backend/node_modules_docker:/app/node_modules
+      - ../backend/src:/app/src
+      - ../backend/generated:/app/generated
+      - ../backend/dist:/app/dist
+      - ../backend/.env:/app/.env
+      - ../backend/prisma.config.ts:/app/prisma.config.ts
+      - ../backend/prisma/:/app/prisma/
     ports:
       - "3000:3000"
+      # - "51212:51212"
+    command: yarn start
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOST=db #mysqlサービス名を指定
-      - PMA_USER=wordpress
-      - PMA_PASSWORD=wordpress
-    links:
-      - db
-    ports:
-      - 4040:80
-    volumes:
-      - ../phpmyadmin/sessions:/sessions
-volumes:
-    db_data:
+  # pgadmin4:
+  #   image: elestio/pgadmin:latest
+  #   restart: always
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=wander@wander.com
+  #     - PGADMIN_DEFAULT_PASSWORD=wander
+  #     - PGADMIN_LISTEN_PORT=8080
+  #     - PGADMIN_CONFIG_SERVER_MODE=False
+  #     - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ../pgadmin/servers.json:/pgadmin4/servers.json
+
+#   phpmyadmin:
+#     image: phpmyadmin/phpmyadmin
+#     environment:
+#       - PMA_ARBITRARY=1
+#       - PMA_HOST=db #mysqlサービス名を指定
+#       - PMA_USER=wander
+#       - PMA_PASSWORD=wander
+#     links:
+#       - db
+#     ports:
+#       - 4040:80
+#     volumes:
+#       - ../phpmyadmin/sessions:/sessions
+# volumes:
+#     db_data:

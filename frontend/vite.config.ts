@@ -16,7 +16,15 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,      // もしくは "0.0.0.0"
+    host: '0.0.0.0',
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://backend:3000',
+        changeOrigin: true,
+        rewrite: (path) => path,
+        // logLevel: 'debug', // removed: not supported in current Vite version
+      }
+    }
   },
 })

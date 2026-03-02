@@ -17,24 +17,20 @@ services:
   app:
     depends_on:
       - db
-    image: node:25.4.0-bullseye-slim
+    build:
+      context: ..
+      dockerfile: .dockerfiles/Dockerfile.app
     ports:
-      - "8000:5173"
-    working_dir: /app
-    command: yarn dev
+      - "8000:80"
+
+  backend:
+    image: node:25.4.0-bullseye-slim
+    working_dir: /usr/src/app
     volumes:
-     - ../frontend/package.json:/app/package.json
-     - ../frontend/yarn.lock:/app/yarn.lock
-     - ../frontend/node_modules_docker:/app/node_modules
-     - ../frontend/src:/app/src
-     - ../frontend/index.html:/app/index.html
-     - ../frontend/tsconfig.json:/app/tsconfig.json
-     - ../frontend/tsconfig.app.json:/app/tsconfig.app.json
-     - ../frontend/tsconfig.node.json:/app/tsconfig.node.json
-     - ../frontend/vite.config.ts:/app/vite.config.ts
-     - ../frontend/public:/app/public
-    environment:
-     - HOST=0.0.0.0
+      - ../backend:/usr/src/app
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

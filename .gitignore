@@ -38,3 +38,4 @@ __screenshots__/
 db/
 phpmyadmin/
 node_modules_docker/
+mysql-db/
