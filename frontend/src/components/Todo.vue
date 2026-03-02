@@ -347,7 +347,7 @@
                 <button class="btn btn-outline-success" @click="syncDB">Save</button>
             </div>
 
-            <div class="overlay-bg position-absolute w-100 h-100" :class="isShowAddTaskPanel ? 'show' : ''">
+            <div class="overlay-bg position-fixed w-100 h-100" :class="isShowAddTaskPanel ? 'show' : ''">
                 <div class="bg-white position-relative overlay-input p-3 rounded">
                     <div class="d-flex justify-content-between mb-2">
                         <h5 class="m-0">{{ taskPanelTitle }}</h5>
@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-            <div class="overlay-bg position-absolute w-100 h-100" :class="isShowAddCategoryPanel ? 'show' : ''">
+            <div class="overlay-bg position-fixed w-100 h-100" :class="isShowAddCategoryPanel ? 'show' : ''">
                 <div class="bg-white position-relative overlay-input p-3 rounded overflow-x-hidden overflow-y-scroll">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="m-0">Manage Category</h5>
