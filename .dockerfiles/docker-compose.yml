@@ -15,7 +15,7 @@ services:
       - POSTGRES_PASSWORD=wander
       - POSTGRES_DB=kusu_db
 
-  app:
+  frontend:
     depends_on:
       - db
       - backend
@@ -58,33 +58,3 @@ services:
       - "3000:3000"
       # - "51212:51212"
     command: yarn start
-
-  # pgadmin4:
-  #   image: elestio/pgadmin:latest
-  #   restart: always
-  #   environment:
-  #     - PGADMIN_DEFAULT_EMAIL=wander@wander.com
-  #     - PGADMIN_DEFAULT_PASSWORD=wander
-  #     - PGADMIN_LISTEN_PORT=8080
-  #     - PGADMIN_CONFIG_SERVER_MODE=False
-  #     - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ../pgadmin/servers.json:/pgadmin4/servers.json
-
-#   phpmyadmin:
-#     image: phpmyadmin/phpmyadmin
-#     environment:
-#       - PMA_ARBITRARY=1
-#       - PMA_HOST=db #mysqlサービス名を指定
-#       - PMA_USER=wander
-#       - PMA_PASSWORD=wander
-#     links:
-#       - db
-#     ports:
-#       - 4040:80
-#     volumes:
-#       - ../phpmyadmin/sessions:/sessions
-# volumes:
-#     db_data:
