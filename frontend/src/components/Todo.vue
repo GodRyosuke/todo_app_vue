@@ -166,7 +166,7 @@
             });
         console.log("todo task sent!, res: ", res);
 
-        const todoId = res.data.todo.id ?? -1;
+        const todoId = res.data?.todo?.id ?? -1;
         todoItems.value.push(new TodoItem(todoId, taskNameInputText.value, categoryName));
         taskNameInputText.value = '';
         selectedCategory.value = categories.value[0] ?? '';
