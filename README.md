@@ -1,4 +1,4 @@
-# vuejs_db
+# todo_app_vue
 
 ## install
 ```bash
