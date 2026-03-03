@@ -134,6 +134,7 @@
     const isShowAddTaskPanel = ref(false);
     const taskPanelTitle = ref('Add Task');
     function showPanel(type: 'task' | 'category', methodType?: 'add' | 'edit') {
+        document.body.classList.add('overflow-hidden');
         if (type === 'task') {
             taskPanelTitle.value = methodType === 'edit' ? 'Edit Task' : 'Add Task';
             isShowAddTaskPanel.value = true;
@@ -142,6 +143,7 @@
         isShowAddCategoryPanel.value = true;
     }
     function closePanel(type: 'task' | 'category') {
+        document.body.classList.remove('overflow-hidden');
         if (type === 'task') {
             isShowAddTaskPanel.value = false;
             return;
