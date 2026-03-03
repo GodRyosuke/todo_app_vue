@@ -8,7 +8,10 @@ yarn build
 cd ..
 ./scripts/yarn_install_docker.bat
 cd .dockerfiles
-docker compose -f .\docker-compose.dev.yml run backend yarn install
+docker compose -f docker-compose.dev.yml run frontend yarn install
+docker compose -f docker-compose.dev.yml run backend yarn install
+docker compose -f docker-compose.dev.yml run backend yarn prisma migrate dev
+docker compose -f docker-compose.dev.yml run backend yarn prisma generate # migrateしたら必ず実行
 docker compose -f ./.dockerfiles/docker-compose.yml build
 ```
 
