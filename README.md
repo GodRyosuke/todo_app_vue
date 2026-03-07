@@ -1,4 +1,9 @@
 # todo_app_vue
+稼働画面<br>
+https://todoapp-frontend-production.up.railway.app/
+
+- ユーザー名: todouser
+- パスワード: todopasswd
 
 ## install
 ```bash
