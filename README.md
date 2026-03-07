@@ -13,10 +13,14 @@ docker compose run backend yarn prisma migrate dev
 docker compose run backend yarn prisma generate # migrateしたら必ず実行
 ```
 
-## run
+## run locally
 ```bash
 cd .dockerfiles
+export DATABASE_URL="postgresql://todouser:tododb@db:5432/todo_db?schema=public"
 docker compose up -d
+
+# for windows
+$Env:DATABASE_URL='postgresql://todouser:tododb@db:5432/todo_db?schema=public'
 ```
 
 ### serve with frontend vite proxy
