@@ -8,9 +8,9 @@ yarn build
 cd ..
 cd .dockerfiles
 docker compose -f docker-compose.dev.yml run frontend yarn install
-docker compose run backend yarn install
-docker compose run backend yarn prisma migrate dev
-docker compose run backend yarn prisma generate # migrateしたら必ず実行
+docker compose -f docker-compose.dev.yml run backend yarn install
+docker compose -f docker-compose.dev.yml run backend yarn prisma migrate dev
+docker compose -f docker-compose.dev.yml run backend yarn prisma generate # migrateしたら必ず実行
 ```
 
 ## run locally
