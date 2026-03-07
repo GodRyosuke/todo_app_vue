@@ -1,17 +1,17 @@
 <script setup lang="ts">
     import { ref, onMounted, onBeforeUnmount } from 'vue'
-    import type { Ref } from 'vue'
-    import { v4 as uuid } from 'uuid';
     import axios from 'axios'
 
+    const initialCategoryName = 'Select task category';
+    const othersCategoryName = 'Others';
     const categories = ref([
-        "Select task category",
+        initialCategoryName,
     ]);
-    const checkedCategories = ref<string[]>([]);
-    const taskNameInputText = ref('');
     const categoryNameInputText = ref('');
-    const selectedCategory = ref<string>(categories.value[0] ?? '');
+    const checkedCategories = ref<string[]>([]);
+
     const isButtonDisabled = ref(false);
+    
     enum TodoStatus {
         TASK,
         DELETED,
@@ -37,11 +37,18 @@
             this.m_name = name;
             this.m_selectedCategory = categoryName;
             this.m_status = TodoStatus.TASK;
-            this.m_nameClasses = [];
             this.m_isDone = false;
+            this.m_isUpdated = false;
         }
 
-        get getName() { return this.m_name; }
+        get name() { return this.m_name; }
+        set name(value: string) {
+            if (value === '') {
+                throw new Error("Task name cannot be empty");
+            }
+            this.m_isUpdated = true;
+            this.m_name = value; 
+        }
         get getStatus() { return this.m_status; }
         check() {
             if (this.m_isDone) {
@@ -60,15 +67,16 @@
         restore() {
             if (this.m_isDone) {
                 this.m_status = TodoStatus.DONE;
-                return;
+            } else {
+                this.m_status = TodoStatus.TASK;
             }
-            this.m_status = TodoStatus.TASK;
             this.m_isUpdated = true;
         }
         get isDeleted() { return this.m_status === TodoStatus.DELETED; }
         get isDone() { return this.m_isDone; }
-        get isUpdated() { return this.m_isUpdated; }
-        get getNameClasses() {
+        get isDBSyncRequired() { return this.m_isUpdated; }
+        resetDBSyncFlag() { this.m_isUpdated = false; }
+        get getNameCssClasses() {
             const classList: string[] = [];
             if (this.isDeleted) {
                 classList.push('text-secondary');
@@ -94,12 +102,43 @@
         private m_selectedCategory: string;
         private m_status: TodoStatus;
         private m_isDone: boolean;
-        private m_isUpdated: boolean = false;
-        private m_nameClasses: string[];
+        private m_isUpdated: boolean;
     };
 
+    class TodoFormData {
+        constructor(actionType: 'add' | 'edit', todoId?: number) {
+            this.m_panelTitle = actionType === 'edit' ? 'Edit Task' : 'Add Task';
+            this.m_panelButtonText = actionType === 'edit' ? 'Edit' : 'Add';
+            if (actionType === 'edit' && todoId === undefined) {
+                throw new Error("Todo id is required for edit action");
+            }
+            if (actionType === 'add' && todoId !== undefined) {
+                throw new Error("Todo id must be undefined for add action");
+            }
+            
+            this.m_id = todoId;
+            if (todoId !== undefined) {
+                const todoItem = todoItems.value.filter(item => item.m_id === todoId)[0];
+                if (!todoItem) {
+                    throw new Error(`Todo item with id ${todoId} is not found`);
+                }
+                this.m_name = todoItem.name;
+                this.m_categoryName = todoItem.category;
+            } else {
+                this.m_name = '';
+                this.m_categoryName = categories.value[0] ?? '';
+            }
+        }
+        
+        public m_id?: number = undefined;
+        public readonly m_panelTitle: string;
+        public readonly m_panelButtonText: string;
+        public m_name: string;
+        public m_categoryName: string;
+    };
+    const todoFormData = ref<TodoFormData | undefined>(undefined);
+
     const todoItems = ref<TodoItem[]>([]);
-    const deleteCandidates: number[] = [];
 
     function onChecked(index: number) {
         const item = todoItems.value[index];
@@ -107,41 +146,17 @@
         item.check();
     }
 
-    function deleteTask(index: number) {
-        const item = todoItems.value[index];
-        if (!item) return;
-        if (item.isDeleted) {
-            return;
-        }
-        item.delete();
-        deleteCandidates.push(index);
-    }
-
-    function restoreTask(index: number) {
-        const item = todoItems.value[index];
-        if (!item) return;
-        if (!item.isDeleted) {
-            return;
-        }
-        item.restore();
-        const candidateIdx = deleteCandidates.indexOf(index);
-        if (candidateIdx !== -1) {
-            deleteCandidates.splice(candidateIdx, 1);
-        }
-    }
-
     const isShowAddCategoryPanel = ref(false);
     const isShowAddTaskPanel = ref(false);
-    const taskPanelTitle = ref('Add Task');
-    function showPanel(type: 'task' | 'category', methodType?: 'add' | 'edit') {
+    function showPanel(type: 'task' | 'category') {
         document.body.classList.add('overflow-hidden');
         if (type === 'task') {
-            taskPanelTitle.value = methodType === 'edit' ? 'Edit Task' : 'Add Task';
             isShowAddTaskPanel.value = true;
             return;
         }
         isShowAddCategoryPanel.value = true;
     }
+
     function closePanel(type: 'task' | 'category') {
         document.body.classList.remove('overflow-hidden');
         if (type === 'task') {
@@ -152,94 +167,145 @@
     }
 
     async function addTask() {
-        isButtonDisabled.value = true;
-
-        let categoryName = selectedCategory.value;
-        if (categoryName === 'Select task category') {
-            categoryName = 'Others';
-        }
-        const res = await axios.post('/api/todos', {
-            name: taskNameInputText.value,
-            categoryName: categoryName,
-            is_done: false,
-        })
-            .catch(err => {
-                return err.response
-            });
-        console.log("todo task sent!, res: ", res);
-
-        const todoId = res.data?.todo?.id ?? -1;
-        todoItems.value.push(new TodoItem(todoId, taskNameInputText.value, categoryName));
-        taskNameInputText.value = '';
-        selectedCategory.value = categories.value[0] ?? '';
-
-        isButtonDisabled.value = false;
-        closePanel('task');
+        todoFormData.value = new TodoFormData('add');
+        showPanel('task');
     }
 
     async function editTask(index: number) {
         const todo: TodoItem = todoItems.value[index] as TodoItem;
-        taskNameInputText.value = todo.getName;
-        selectedCategory.value = todo.category;
-        showPanel('task', 'edit');
+        todoFormData.value = new TodoFormData('edit', todo.m_id);
+        showPanel('task');
+    }
+    
+    async function sendTask() {
+        if (!todoFormData.value) {
+            throw new Error("todoFormData is null");
+        }
+        const isAddTodo = todoFormData.value.m_id === undefined;
+        
+        if (todoFormData.value.m_name === '') {
+            alert("Task name cannot be empty");
+            return;
+        }
+
+        let categoryName = todoFormData.value.m_categoryName;
+        if (categoryName === initialCategoryName) {
+            categoryName = othersCategoryName;
+        }
+
+        isButtonDisabled.value = true;
+        if (isAddTodo) {
+            try {
+                const res = await axios.post('/api/todos', {
+                    name: todoFormData.value.m_name,
+                    categoryName: categoryName,
+                    is_done: false,
+                })
+                console.log("add todo res: ", res);
+                todoItems.value.push(new TodoItem(res.data.todo.id, todoFormData.value.m_name, categoryName));
+            } catch(err: any) {
+                console.error(`Failed to add todo: ${err.response?.data?.message ?? err.message}`);
+                return;
+            } finally {
+                isButtonDisabled.value = false;
+            }
+        } else {
+            try {
+                if (todoFormData.value.m_id === undefined) {
+                    throw new Error("Todo id is required in edit action.");
+                }
+                await axios.put('/api/todos', {
+                    data: {
+                        todoItems: [{
+                            id: todoFormData.value!.m_id,
+                            name: todoFormData.value!.m_name,
+                            categoryName: categoryName,
+                            is_done: todoItems.value.filter(item => item.m_id === todoFormData.value!.m_id)[0]?.isDone ?? false,
+                        }]
+                    }
+                })
+
+                // update local todo data
+                const todoItem = todoItems.value.filter(item => item.m_id === todoFormData.value!.m_id)[0] as TodoItem;
+                if (!todoItem) {
+                    throw new Error(`Todo item with id ${todoFormData.value!.m_id} is not found`);
+                }
+                todoItem.name = todoFormData.value!.m_name;
+                todoItem.category = categoryName;
+                todoItem.resetDBSyncFlag();
+            } catch(err: any) {
+                console.error(`Failed to edit todo: ${err.response?.data?.message ?? err.message}`);
+                return;
+            } finally {
+                isButtonDisabled.value = false;
+            }
+        }
+
+        todoFormData.value = undefined;
+        closePanel('task');
     }
 
+    function manageCategory() {
+        showPanel('category');
+    }
+    
     async function addCategory() {
-        isButtonDisabled.value = true;
-
         if (categoryNameInputText.value === '') {
-            isButtonDisabled.value = false;
-            closePanel('category');
+            alert("Category name cannot be empty");
             return;
         }
-
         if (categories.value.includes(categoryNameInputText.value)) {
             // 同一のカテゴリ名は受け付けない
-            isButtonDisabled.value = false;
-            closePanel('category');
+            alert(`Category: ${categoryNameInputText.value} already exists`);
             return;
         }
 
-        const res = await axios.post('/api/categories', {
-            categoryName: categoryNameInputText.value,
-        })
-            .catch(err => {
-                return err.response
-            });
-        console.log("category sent!, res: ", res);
+        isButtonDisabled.value = true;
+        try {
+            const res = await axios.post('/api/categories', {
+                categoryName: categoryNameInputText.value,
+            })
+            console.log("addCategory: ", res);
+            categories.value = categories.value.slice(0, -1);
+            categories.value.push(categoryNameInputText.value);
+            categories.value.push(othersCategoryName);
+            categoryNameInputText.value = '';
+        } catch(err: any) {
+            console.error(`Failed to add category: ${err.response?.data?.message ?? err.message}`);
+            return;
+        } finally {
+            isButtonDisabled.value = false;
+        }
 
-        categories.value = categories.value.slice(0, -1);
-        categories.value.push(categoryNameInputText.value);
-        categories.value.push("Others");
-        categoryNameInputText.value = '';
-        isButtonDisabled.value = false;
         closePanel('category');
     }
 
     async function deleteCategory() {
-        isButtonDisabled.value = true;
-        categories.value = categories.value.filter(category => !checkedCategories.value.includes(category));
-
         const deleteCategoryNames = checkedCategories.value;
-        const res = await axios.delete('/api/categories', {
-            data: {
-                categoryNames: deleteCategoryNames,
-            }
-        })
-            .catch(err => {
-                return err.response
-            });
-        console.log("category delete sent!, res: ", res);
+        isButtonDisabled.value = true;
+        try {
+            const res = await axios.delete('/api/categories', {
+                data: {
+                    categoryNames: deleteCategoryNames,
+                }
+            })
+            console.log("deleteCategory: ", res);
+            categories.value = categories.value.filter(category => !checkedCategories.value.includes(category));
 
-        // 削除されるカテゴリを保持しているtaskのカテゴリをOthersに更新する
-        for (const todoItem of todoItems.value) {
-            if (deleteCategoryNames.includes(todoItem.category)) {
-                todoItem.category = 'Others';
+            // 削除されるカテゴリを保持しているtaskのカテゴリをOthersに更新する
+            for (const todoItem of todoItems.value) {
+                if (deleteCategoryNames.includes(todoItem.category)) {
+                    todoItem.category = othersCategoryName;
+                }
             }
+        } catch(err: any) {
+            console.error(`Failed to delete category: ${err.response?.data?.message ?? err.message}`);
+            return;
+        } finally {
+            isButtonDisabled.value = false;
         }
         
         checkedCategories.value = [];
-        isButtonDisabled.value = false;
         closePanel('category');
     }
 
@@ -249,48 +315,62 @@
             .filter((item) => item.isDeleted)
             .map((item) => item.m_id);
         if (deletedTodoIds.length !== 0) {
-            const result = window.confirm(`Following todos will be deleted:\n${todoItems.value.filter((item) => item.isDeleted).map((item) => item.getName).join(', ')}.\nThis action cannot be undone. Do you want to proceed?`);
+            const result = window.confirm(`Following todos will be deleted:\n${todoItems.value.filter((item) => item.isDeleted).map((item) => item.name).join(', ')}.\nThis action cannot be undone. Do you want to proceed?`);
             if (!result) {
                 return;
             }
-            await axios.delete('/api/todos', {
-                data: {
-                    todoIds: deletedTodoIds,
-                }
-            })
-                .catch(err => {
-                    return err.response
-                });
-    
-            todoItems.value = todoItems.value.filter((item) => !item.isDeleted);
+
+            isButtonDisabled.value = true;
+            try {
+                await axios.delete('/api/todos', {
+                    data: {
+                        todoIds: deletedTodoIds,
+                    }
+                })
+                todoItems.value = todoItems.value.filter((item) => !item.isDeleted);
+            } catch (err: any) {
+                console.error(`Failed to delete todos: ${err.response?.data?.message ?? err.message}`);
+                return;
+            } finally {
+                isButtonDisabled.value = false;
+            }
         }
 
         // 変更されたtodoをサーバーに送信する
         const changedTodoItems: TodoItem[] = [];
         for (const item of todoItems.value as TodoItem[]) {
-            if (item.isUpdated) {
+            if (item.isDBSyncRequired) {
                 changedTodoItems.push(item);
             }
         }
-        const res = await axios.put('/api/todos', {
-            data: {
-                todoItems: changedTodoItems.map((item) => ({
-                    id: item.m_id,
-                    name: item.getName,
-                    categoryName: item.category,
-                    is_done: item.isDone,
-                })),
+        isButtonDisabled.value = true;
+        try {
+            await axios.put('/api/todos', {
+                data: {
+                    todoItems: changedTodoItems.map((item) => ({
+                        id: item.m_id,
+                        name: item.name,
+                        categoryName: item.category,
+                        is_done: item.isDone,
+                    })),
+                }
+            })
+            for (const item of changedTodoItems) {
+                item.resetDBSyncFlag();
             }
-        })
-            .catch(err => {
-                return err.response
-            });
-        console.log("todo update sent!, res: ", res);
+        } catch (err: any) {
+            console.error(`Failed to update todos: ${err.response?.data?.message ?? err.message}`);
+            return;
+        } finally {
+            isButtonDisabled.value = false;
+        }
     }
 
-    const handleBeforeUnload = async (event: any) => {
-        console.log("リロードまたはページ離脱");
-        await syncDB();
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+        const hasUnsavedChanges = todoItems.value.some(item => item.isDBSyncRequired || item.isDeleted);
+        if (hasUnsavedChanges) {
+            event.preventDefault();
+        }
     };
 
     onMounted(async () => {
@@ -299,24 +379,25 @@
             .catch(err => {
                 return err.response
             });
-        console.log("categories received!, res: ", categoryRes);
+        console.log("category get res: ", categoryRes);
         if (categoryRes.data === undefined) {
             return;
         }
         for (const category of categoryRes.data) {
-            if (category.name === 'Others') {
+            if (category.name === othersCategoryName) {
+                // Othersカテゴリは常に最後尾に表示させるため、categoriesの配列には追加しない
                 continue;
             }
             categories.value.push(category.name);
         }
-        categories.value.push('Others');
+        categories.value.push(othersCategoryName);
 
         // load todos
         const todoRes = await axios.get('/api/todos')
             .catch(err => {
                 return err.response
             });
-        console.log("todos received!, res: ", todoRes);
+        console.log("todo get: ", todoRes);
         if (todoRes.data === undefined) {
             return;
         }
@@ -326,6 +407,7 @@
             const todoItem = new TodoItem(todo.id, todo.name, categoryName);
             if (todo.is_done) {
                 todoItem.check();
+                todoItem.resetDBSyncFlag();
             }
             todoItems.value.push(todoItem);
         }
@@ -344,32 +426,32 @@
         <div class="container-fluid w-100 py-4">
             <h3 class="fw-2">Work</h3>
             <div class="d-flex flex-wrap gap-1 py-2">
-                <button class="btn btn-outline-primary" @click="showPanel('task')">Add Task</button>
-                <button class="btn btn-outline-secondary" @click="showPanel('category')">Manage Category</button>
-                <button class="btn btn-outline-success" @click="syncDB">Save</button>
+                <button class="btn btn-outline-primary" @click="addTask">Add Task</button>
+                <button class="btn btn-outline-secondary" @click="manageCategory">Manage Category</button>
+                <button class="btn btn-outline-success" @click="syncDB" :disabled="isButtonDisabled">Save</button>
             </div>
 
             <div class="overlay-bg position-fixed w-100 h-100" :class="isShowAddTaskPanel ? 'show' : ''">
                 <div class="bg-white position-relative overlay-input p-3 rounded">
                     <div class="d-flex justify-content-between mb-2">
-                        <h5 class="m-0">{{ taskPanelTitle }}</h5>
+                        <h5 class="m-0">{{ todoFormData ? todoFormData.m_panelTitle : '' }}</h5>
                         <span class="d-inline-block material-symbols-outlined cursor-pointer"
                             @click="closePanel('task')">close</span>
                     </div>
                     <div class="mb-3">
                         <label for="task-name" class="form-label">Task Name</label>
                         <input type="text" class="form-control" id="task-name" placeholder="enter task name here"
-                            v-model="taskNameInputText">
+                            v-if="todoFormData" v-model="todoFormData.m_name">
                     </div>
                     <div class="mb-3">
                         <label for="select-task-category" class="form-label">Select Category</label>
-                        <select class="form-select" v-model="selectedCategory">
+                        <select class="form-select" v-if="todoFormData" v-model="todoFormData.m_categoryName">
                             <option v-for="(category, idx) in categories" :key="idx" :value="category">{{category}}
                             </option>
                         </select>
                     </div>
                     <div class="d-flex align-items-center justify-content-end gap-2">
-                        <button type="button" class="btn btn-primary" @click="addTask" :disabled="isButtonDisabled">{{ taskPanelTitle }}</button>
+                        <button type="button" class="btn btn-primary" @click="sendTask" :disabled="isButtonDisabled">{{ todoFormData ? todoFormData.m_panelButtonText : '' }}</button>
                     </div>
                 </div>
             </div>
@@ -434,7 +516,7 @@
                                         :disabled="todoItem.isDeleted" :checked="todoItem.isDone">
                                 </div>
                             </th>
-                            <td :class="todoItem.getNameClasses">{{todoItem.getName}}</td>
+                            <td :class="todoItem.getNameCssClasses">{{todoItem.name}}</td>
                             <td>
                                 <select class="form-select" :disabled="todoItem.isDeleted" v-model="todoItem.category">
                                     <option v-for="category in categories" :value="category">{{category}}</option>
@@ -448,7 +530,7 @@
                                     :class="todoItem.isDeleted ? 'text-secondary' : 'cursor-pointer'"
                                     @click="editTask(index)">edit</span>
                                 <span class="material-symbols-outlined cursor-pointer"
-                                    @click="todoItem.isDeleted ? restoreTask(index) : deleteTask(index)">{{todoItem.isDeleted
+                                    @click="todoItem.isDeleted ? todoItem.restore() : todoItem.delete()">{{todoItem.isDeleted
                                     ? 'restore_from_trash' : 'delete'}}</span>
                             </td>
                         </tr>
