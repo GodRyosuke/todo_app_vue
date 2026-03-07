@@ -7,6 +7,7 @@ COPY ./frontend/tsconfig.json /app/tsconfig.json
 COPY ./frontend/tsconfig.app.json /app/tsconfig.app.json
 COPY ./frontend/tsconfig.node.json /app/tsconfig.node.json
 COPY ./frontend/src /app/src
+COPY ./frontend/public /app/public
 COPY ./frontend/index.html /app/index.html
 
 WORKDIR /app
