@@ -11,9 +11,9 @@ services:
     environment:
       - TZ=Asia/Tokyo
       - PGTZ=Asia/Tokyo
-      - POSTGRES_USER=wander
-      - POSTGRES_PASSWORD=wander
-      - POSTGRES_DB=kusu_db
+      - POSTGRES_USER=todouser
+      - POSTGRES_PASSWORD=tododb
+      - POSTGRES_DB=todo_db
 
   frontend:
     depends_on:

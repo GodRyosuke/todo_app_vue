@@ -7,41 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model session_data {
-  points      Int?
-  balance     Decimal?  @db.Decimal(10, 2)
-  post_code   String?   @db.VarChar(7)
-  last_login  DateTime? @db.Timestamptz(6)
-  is_active   Boolean?
-  preferences Json?
-  serial_no   Int       @default(autoincrement())
-
-  @@ignore
-}
-
-model users {
-  id       String    @id @db.Uuid
-  name     String?
-  birthday DateTime? @db.Date
-}
-
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
-}
-
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
-}
-
 model Todo {
   id         Int      @id @default(autoincrement())
   name       String   @db.VarChar(256)
