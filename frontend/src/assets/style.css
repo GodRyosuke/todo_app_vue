@@ -211,4 +211,26 @@ main .desc {
 }
 .overlay-bg.show .overlay-input {
   top: 3rem;
+}
+
+.icon-lg {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #000;
+}
+
+main.login {
+  background: linear-gradient(white, var(--dark-accent-color)) !important;
+}
+main.login form {
+  min-width: 250px;
+}
+@media screen and (min-width: 425px) {
+  main.login form {
+    min-width: 300px;
+  }
+}
+main.login .sns-signin .text {
+  top: 0.5rem;
+  left: 0;
 }/*# sourceMappingURL=style.css.map */
