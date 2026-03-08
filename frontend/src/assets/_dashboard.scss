@@ -1,0 +1,48 @@
+.text-decoration-line-through {
+    text-decoration: line-through !important;
+}
+
+.task-table {
+    min-width: 600px;
+}
+
+.overlay-bg {
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: -1;
+    background-color: rgba(33, 33, 33, 0.648);
+    transition: all 0.5s ease;
+
+    .overlay-input {
+        height: 400px;
+        width: calc(300px + 2rem);
+        top: -100%;
+        left: calc((100% - 300px - 2rem) / 2);
+        transition: top 0.5s ease;
+
+        .input-text {
+            width: 300px;
+        }
+    }
+
+    @media screen and (max-width: 426px) {
+        .overlay-input {
+            width: calc(100% - 2rem);
+            left: 1rem;
+
+            input {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.overlay-bg.show {
+    opacity: 1.0;
+    z-index: 100;
+
+    .overlay-input {
+        top: 3rem;
+    }
+}

@@ -9,6 +9,12 @@ $h4-font-size: $font-size-base * 1.5;
 $h5-font-size: $font-size-base * 1.25;
 $h6-font-size: $font-size-base;
 
+:root {
+    --gray-color: #6b6b6b;
+    --light-accent-color: #90ee90;
+    --dark-accent-color: #006400;
+}
+
 a {
     text-decoration: none;
     color: inherit;
@@ -25,51 +31,25 @@ a:hover {
     cursor: pointer !important;
 }
 
-.text-decoration-line-through {
-    text-decoration: line-through !important;
+.fs-sm {
+    font-size: 0.75rem;
 }
 
-.task-table {
-    min-width: 600px;
+.fs-xsm {
+    font-size: 0.5rem;
 }
 
-.overlay-bg {
-    top: 0;
-    left: 0;
-    opacity: 0;
-    z-index: -1;
-    background-color: rgba(33, 33, 33, 0.648);
-    transition: all 0.5s ease;
-
-    .overlay-input {
-        height: 400px;
-        width: calc(300px + 2rem);
-        top: -100%;
-        left: calc((100% - 300px - 2rem) / 2);
-        transition: top 0.5s ease;
-
-        .input-text {
-            width: 300px;
-        }
-    }
-
-    @media screen and (max-width: 426px) {
-        .overlay-input {
-            width: calc(100% - 2rem);
-            left: 1rem;
-
-            input {
-                width: 100%;
-            }
-        }
-    }
+.fs-2xsm {
+    font-size: 0.25rem;
 }
 
-.overlay-bg.show {
-    opacity: 1.0;
-    z-index: 100;
-
-    .overlay-input {
-        top: 3rem;
-    }
+.text-gray {
+    color: var(--gray-color);
 }
+
+.list-style-none {
+    list-style: none;
+}
+
+@import 'landing_page';
+@import 'dashboard';

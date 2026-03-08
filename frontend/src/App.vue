@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import Header from './components/Header.vue'
-import Todo from './components/Todo.vue'
+import Main from './components/landing_page/Main.vue';
 </script>
 
 <template>
-  <Header />
-  <Todo />
+  <Main />
 </template>
 
