@@ -1,0 +1,155 @@
+.icon {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #000;
+    padding: 5px;
+}
+
+.gray-btn {
+    border: 1px solid #cfcfcf;
+    background-color: #f3f3f3;
+    transition: all 0.5s ease;
+}
+
+.gray-btn:hover {
+    border-color: #000;
+    background-color: #000;
+    color: #fff;
+}
+
+.green-btn {
+    border: 1px solid var(--dark-accent-color);
+    background-color: var(--dark-accent-color);
+    color: #fff;
+    transition: all 0.5s ease;
+}
+
+.green-btn:hover {
+    border-color: var(--dark-accent-color);
+    background-color: transparent;
+    color: var(--dark-accent-color);
+}
+
+.green-btn:disabled {
+    border-color: var(--dark-accent-color);
+    background-color: transparent;
+    color: var(--dark-accent-color);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+header {
+    z-index: 10;
+    top: 0;
+    left: 0;
+
+    nav {
+        list-style: none;
+    }
+
+    .header-nav-bar {
+        width: calc(100% - 30px - 1.5rem);
+    }
+
+    @media screen and (max-width: 1200px) {
+        .header-nav-bar {
+            height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .header-nav-bar.show {
+            height: calc(100vh - 3rem);
+        }
+    }
+
+}
+
+.header-bars {
+    width: calc(100% - 30px - 3.5rem);
+    height: auto;
+    z-index: 10;
+    top: 0.5rem;
+    left: calc(2.5rem + 30px);
+
+    @media screen and (max-width: 1200px) {
+        height: 0;
+        width: 100%;
+        top: calc(1rem + 30px);
+        left: 0;
+        z-index: -1;
+        overflow: hidden;
+        background-color: transparent;
+        transition: all 0.3s ease;
+
+        >* {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    }
+}
+
+.header-bars.show {
+    height: calc(100vh - 30px - 1rem);
+    z-index: 10;
+    background-color: white;
+
+    >* {
+        opacity: 1;
+    }
+}
+
+.text-gradiant {
+    color: transparent;
+    background: linear-gradient(90deg, var(--dark-accent-color), 5%, white) !important;
+    background-clip: text;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+}
+
+.landing-page {
+    margin-top: calc(30px + 1rem);
+    background: linear-gradient(20deg, black, 80%, var(--dark-accent-color), #808000);
+
+    .banner {
+        height: 400px;
+        background-color: transparent;
+
+        .pre-title {
+            font-family: "Bitcount Grid Single", system-ui;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+                "slnt" 0,
+                "CRSV" 0.5,
+                "ELSH" 0,
+                "ELXP" 0;
+        }
+    }
+
+    .features {
+        .desc-card {
+            border: 1px solid var(--dark-accent-color);
+
+            .desc-card-text-item {
+                flex: 1 1 30%;
+            }
+            .desc-card-img-item {
+                flex: 1 1 70%;
+            }
+        }
+    }
+
+    .bottom {
+        height: 400px;
+
+        .item {
+            flex: 1 1 50%;
+        }
+    }
+
+    .desc {
+        height: calc(100vh - 50px);
+    }
+}

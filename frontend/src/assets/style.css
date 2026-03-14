@@ -1,3 +1,9 @@
+:root {
+  --gray-color: #6b6b6b;
+  --light-accent-color: #90ee90;
+  --dark-accent-color: #006400;
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -14,8 +20,201 @@ a:hover {
   cursor: pointer !important;
 }
 
+.fs-sm {
+  font-size: 0.75rem;
+}
+
+.fs-xsm {
+  font-size: 0.5rem;
+}
+
+.fs-2xsm {
+  font-size: 0.25rem;
+}
+
+.text-gray {
+  color: var(--gray-color);
+}
+
+.list-style-none {
+  list-style: none;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #000;
+  padding: 5px;
+}
+
+.gray-btn {
+  border: 1px solid #cfcfcf;
+  background-color: #f3f3f3;
+  transition: all 0.5s ease;
+}
+
+.gray-btn:hover {
+  border-color: #000;
+  background-color: #000;
+  color: #fff;
+}
+
+.green-btn {
+  border: 1px solid var(--dark-accent-color);
+  background-color: var(--dark-accent-color);
+  color: #fff;
+  transition: all 0.5s ease;
+}
+
+.green-btn:hover {
+  border-color: var(--dark-accent-color);
+  background-color: transparent;
+  color: var(--dark-accent-color);
+}
+
+.green-btn:disabled {
+  border-color: var(--dark-accent-color);
+  background-color: transparent;
+  color: var(--dark-accent-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+header {
+  z-index: 10;
+  top: 0;
+  left: 0;
+}
+header nav {
+  list-style: none;
+}
+header .header-nav-bar {
+  width: calc(100% - 30px - 1.5rem);
+}
+@media screen and (max-width: 1200px) {
+  header .header-nav-bar {
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  header .header-nav-bar.show {
+    height: calc(100vh - 3rem);
+  }
+}
+
+.header-bars {
+  width: calc(100% - 30px - 3.5rem);
+  height: auto;
+  z-index: 10;
+  top: 0.5rem;
+  left: calc(2.5rem + 30px);
+}
+@media screen and (max-width: 1200px) {
+  .header-bars {
+    height: 0;
+    width: 100%;
+    top: calc(1rem + 30px);
+    left: 0;
+    z-index: -1;
+    overflow: hidden;
+    background-color: transparent;
+    transition: all 0.3s ease;
+  }
+  .header-bars > * {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
+
+.header-bars.show {
+  height: calc(100vh - 30px - 1rem);
+  z-index: 10;
+  background-color: white;
+}
+.header-bars.show > * {
+  opacity: 1;
+}
+
+.text-gradiant {
+  color: transparent;
+  background: linear-gradient(90deg, var(--dark-accent-color), 5%, white) !important;
+  background-clip: text;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-page {
+  margin-top: calc(30px + 1rem);
+  background: linear-gradient(20deg, black, 80%, var(--dark-accent-color), #808000);
+}
+.landing-page .banner {
+  height: 400px;
+  background-color: transparent;
+}
+.landing-page .banner .pre-title {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "slnt" 0, "CRSV" 0.5, "ELSH" 0, "ELXP" 0;
+}
+.landing-page .features .desc-card {
+  border: 1px solid var(--dark-accent-color);
+}
+.landing-page .features .desc-card .desc-card-text-item {
+  flex: 1 1 30%;
+}
+.landing-page .features .desc-card .desc-card-img-item {
+  flex: 1 1 70%;
+}
+.landing-page .bottom {
+  height: 400px;
+}
+.landing-page .bottom .item {
+  flex: 1 1 50%;
+}
+.landing-page .desc {
+  height: calc(100vh - 50px);
+}
+
 .text-decoration-line-through {
   text-decoration: line-through !important;
+}
+
+.todo-sidebar {
+  background-color: rgba(33, 33, 33, 0.648);
+  top: calc(3.3rem + 0.6vw);
+  left: 0;
+  z-index: -1;
+  opacity: 0;
+  height: calc(100vh - calc(3.3rem + 0.6vw));
+  width: 100vw;
+  transition: all 0.5s ease;
+}
+.todo-sidebar .sidebar {
+  top: 0;
+  right: -400px;
+  z-index: inherit;
+  opacity: 0;
+  width: 400px;
+  background-color: white;
+  height: 100%;
+  transition: all 0.5s ease;
+}
+@media screen and (max-width: 768px) {
+  .todo-sidebar .sidebar {
+    width: 100%;
+    right: -100%;
+  }
+}
+
+.todo-sidebar.show {
+  z-index: 100;
+  opacity: 1;
+}
+.todo-sidebar.show .sidebar {
+  opacity: 1;
+  right: 0;
 }
 
 .task-table {
@@ -45,9 +244,6 @@ a:hover {
     width: calc(100% - 2rem);
     left: 1rem;
   }
-  .overlay-bg .overlay-input input {
-    width: 100%;
-  }
 }
 
 .overlay-bg.show {
@@ -56,4 +252,26 @@ a:hover {
 }
 .overlay-bg.show .overlay-input {
   top: 3rem;
+}
+
+.icon-lg {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #000;
+}
+
+.login {
+  background: linear-gradient(white, var(--dark-accent-color)) !important;
+}
+.login form {
+  min-width: 250px;
+}
+@media screen and (min-width: 425px) {
+  .login form {
+    min-width: 300px;
+  }
+}
+.login .sns-signin .text {
+  top: 0.5rem;
+  left: 0;
 }/*# sourceMappingURL=style.css.map */

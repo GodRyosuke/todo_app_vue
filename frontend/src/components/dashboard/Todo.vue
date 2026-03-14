@@ -367,13 +367,35 @@
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-        const hasUnsavedChanges = todoItems.value.some(item => item.isDBSyncRequired || item.isDeleted);
-        if (hasUnsavedChanges) {
+        if (hasUnsavedChanges()) {
             event.preventDefault();
         }
     };
 
+    async function redirectIfNotAuthenticated() {
+        try {
+            await axios.post('/api/verify-token');
+        } catch(err) {
+            console.error("Invalid token. Redirecting to login page");
+            localStorage.removeItem("authToken");
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        }
+    }
+
     onMounted(async () => {
+        axios.interceptors.request.use((config) => {
+            const token = localStorage.getItem("authToken")
+
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`
+            }
+
+            return config
+        })
+        await redirectIfNotAuthenticated();
+
         // load categories
         const categoryRes = await axios.get('/api/categories')
             .catch(err => {
@@ -419,6 +441,12 @@
     onBeforeUnmount(() => {
         window.removeEventListener("beforeunload", handleBeforeUnload);
     });
+
+    function hasUnsavedChanges(): boolean {
+        return todoItems.value.some(item => item.isDBSyncRequired || item.isDeleted);
+    }
+
+    defineExpose({ hasUnsavedChanges, syncDB });
 </script>
 
 <template>
@@ -464,7 +492,7 @@
                             @click="closePanel('category')">close</span>
                     </div>
                     <div class="fw-bold mb-2">Add Category</div>
-                    <input type="text" class="form-control input-text mb-3" placeholder="enter category name here"
+                    <input type="text" class="form-control input-text w-100 mb-3" placeholder="enter category name here"
                         v-model="categoryNameInputText">
                     <div class="d-flex align-items-center justify-content-end gap-2 mb-3">
                         <button class="btn btn-secondary" @click="addCategory" :disabled="isButtonDisabled">Add
