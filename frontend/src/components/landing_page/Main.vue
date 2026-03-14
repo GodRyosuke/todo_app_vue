@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <main class="container-fluid">
+    <main class="landing-page container-fluid">
         <section class="banner d-flex align-items-center justify-content-center">
             <div class="d-flex flex-column align-items-center">
                 <h2 class="d-block pre-title text-white fs-3 text-center mb-4">

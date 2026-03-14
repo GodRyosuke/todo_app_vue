@@ -30,6 +30,14 @@
     color: var(--dark-accent-color);
 }
 
+.green-btn:disabled {
+    border-color: var(--dark-accent-color);
+    background-color: transparent;
+    color: var(--dark-accent-color);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 header {
     z-index: 10;
     top: 0;
@@ -99,7 +107,7 @@ header {
     -webkit-text-fill-color: transparent;
 }
 
-main {
+.landing-page {
     margin-top: calc(30px + 1rem);
     background: linear-gradient(20deg, black, 80%, var(--dark-accent-color), #808000);
 

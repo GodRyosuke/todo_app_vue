@@ -2,6 +2,43 @@
     text-decoration: line-through !important;
 }
 
+.todo-sidebar {
+    background-color: rgba(33, 33, 33, 0.648);
+    $header-height: calc(2rem + 1.3rem + .6vw);
+    $sidebar-height: calc(100vh - #{$header-height});
+    
+    top: $header-height;
+    left: 0;
+    z-index: -1;
+    opacity: 0;
+    height: $sidebar-height;
+    width: 100vw;
+    transition: all 0.5s ease;
+    .sidebar {
+        top: 0;
+        right: -400px;
+        z-index: inherit;
+        opacity: 0;
+        width: 400px;
+        background-color: white;
+        height: 100%;
+        transition: all 0.5s ease;
+
+        @media screen and (max-width: 768px) {
+            width: 100%;
+            right: -100%;
+        }
+    }
+}
+.todo-sidebar.show {
+    z-index: 100;
+    opacity: 1;
+    .sidebar {
+        opacity: 1;
+        right: 0;
+    }
+}
+
 .task-table {
     min-width: 600px;
 }
@@ -30,10 +67,6 @@
         .overlay-input {
             width: calc(100% - 2rem);
             left: 1rem;
-
-            input {
-                width: 100%;
-            }
         }
     }
 }

@@ -100,51 +100,11 @@
                 <img src="@/assets/img/page_icon.png" alt="icon" class="d-block rounded-circle icon-lg mb-4 p-2">
     
                 <div class="bg-white rounded shadow-lg p-3 m-3">
-                    <h3 class="text-center fw-medium mb-3">Login</h3>
-                    <div class="alert alert-danger alert-dismissible w-100" v-for="(alertString, index) in alertDangerStrings" :key="index">
-                        {{ alertString }}
-                        <button type="button" class="btn-close" @click="alertDangerStrings.splice(index, 1)"></button>
-                    </div>
-                    <div class="alert alert-success alert-dismissible w-100" v-for="(alertString, index) in alertSuccessStrings" :key="index">
-                        {{ alertString }}
-                        <button type="button" class="btn-close" @click="alertSuccessStrings.splice(index, 1)"></button>
-                    </div>
-                    <form @submit.prevent="login" class="mb-3">
-                        <label for="username">Email</label>
-                        <input type="text" placeholder="Email" class="form-control mb-3" id="username" v-model="form.email">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <label for="password">Password</label>
-                            <div class="text-gray cursor-pointer" @click="passWordInputType = passWordInputType === 'password' ? 'text' : 'password'">
-                                {{ passWordInputType === 'password' ? 'Show' : 'Hide' }}
-                            </div>
-                        </div>
-                        <input :type="passWordInputType" placeholder="Password" class="form-control mb-3" id="password" v-model="form.password">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div>
-                                <input type="checkbox" id="remember" class="me-1" v-model="form.staySignedIn">
-                                <label for="remember" class="text-gray">Remember me</label>
-                            </div>
-                            <router-link to="/login/recovery" class="text-primary fs-sm">forgot your password?</router-link>
-                        </div>
-                        <button type="submit" class="green-btn rounded fw-medium px-3 py-1 w-100" :disabled="isButtonDisabled">Login</button>
-                    </form>
-                    <div class="text-center text-gray w-100 mb-3">or</div>
-                    
-                    <a href="" class="sns-signin rounded border d-block position-relative w-100 p-2 mb-3">
-                        <i class="bi bi-google"></i>
-                        <div class="text position-absolute text-center w-100">
-                            Sign in with Google
-                        </div>
-                    </a>
-                    <a href="" class="sns-signin rounded border d-block position-relative w-100 p-2">
-                        <i class="bi bi-github"></i>
-                        <div class="text position-absolute text-center w-100">
-                            Sign in with Github
-                        </div>
-                    </a>
+                    <h3 class="text-center fw-medium mb-3 fs-4">Logout</h3>
+                    <div class="text-center text-secondary mb-3">Thank you for using our service!</div>
                 </div>
                 <div class="text-center text-white text-decoration-underline w-100 mb-3">
-                    <router-link to="/sign-up">Create free account</router-link>
+                    <router-link to="/login">Login again</router-link>
                 </div>
             </div>
             

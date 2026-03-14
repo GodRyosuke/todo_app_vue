@@ -13,10 +13,31 @@ model Todo {
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
   is_done    Boolean
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
 }
 
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String @db.VarChar(256)
+  id     Int    @id @default(autoincrement())
+  name   String @db.VarChar(256)
+  todos  Todo[]
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String
+  email    String @unique
+  password String
+
+  verified Boolean @default(false)
+
+  verifyToken String?
+  tokenExpiry DateTime?
+
   todos Todo[]
+
+  createdAt  DateTime   @default(now())
+  categories Category[]
 }
